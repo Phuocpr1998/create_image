@@ -75,6 +75,7 @@ fi
 # change timezone
 echo "==Change timezone"
 echo "Asia/Ho_Chi_Minh" | /usr/bin/tee $PATH/etc/timezone
+/bin/ln -sf /usr/share/zoneinfo/Asia/Ho_Chi_Minh $PATH/etc/localtime
 # change hostname
 echo "==Change hostname"
 echo "vccoppcplus" | /usr/bin/tee $PATH/etc/hostname
