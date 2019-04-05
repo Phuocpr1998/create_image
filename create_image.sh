@@ -149,9 +149,9 @@ echo "==Enable service"
 /bin/cp -rf $PATH/home/pi/hub/hub.service $PATH/lib/systemd/system/
 /bin/cp -rf $PATH/home/pi/hub/hub-controller.service $PATH/lib/systemd/system/
 
-/bin/ln -s $PATH/lib/systemd/system/hub.service $PATH/etc/systemd/system/
-/bin/ln -s $PATH/lib/systemd/system/hub-controller.service $PATH/etc/systemd/system/
-/bin/ln -s $PATH/lib/systemd/system/hub.service $PATH/etc/systemd/system/multi-user.target.wants/hub.service
-/bin/ln -s $PATH/lib/systemd/system/hub-controller.service $PATH/etc/systemd/system/multi-user.target.wants/hub-controller.service
+/bin/ln -s /lib/systemd/system/hub.service $PATH/etc/systemd/system/
+/bin/ln -s /lib/systemd/system/hub-controller.service $PATH/etc/systemd/system/
+/bin/ln -s /lib/systemd/system/hub.service $PATH/etc/systemd/system/multi-user.target.wants/hub.service
+/bin/ln -s /lib/systemd/system/hub-controller.service $PATH/etc/systemd/system/multi-user.target.wants/hub-controller.service
 
 echo "==Done=="
