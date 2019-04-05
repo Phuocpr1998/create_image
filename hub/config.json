@@ -1,0 +1,12 @@
+{
+	"token": "",
+	"model": "OPZ512",
+	"agency": "vcc",
+	"interface": "eth0",
+	"server": "https://api.vcloudcam.vn",
+	"segmentLength": 30,
+	"run": "prod",
+	"memDebug": false,
+	"recordPath": "/tmp/record",
+	"maxQueueSize": 12
+}
