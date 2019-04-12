@@ -137,6 +137,8 @@ echo "==Download hub binary"
 /usr/bin/wget -O $PATH/home/pi/hub/hubctl "https://uvcloudcam:yUEq4Dy1=7SjPXkkd4Dydq3Q7RE0ukkdq3Q@repo.vcloudcam.vn/download/hub/hub-controller-$VERSIONHUBCTL-linux-$ARCH"
 /bin/chmod +x $PATH/home/pi/hub/hub
 /bin/chmod +x $PATH/home/pi/hub/hubctl
+/bin/chmod 777 $PATH/home/pi/hub
+/bin/chmod 777 -f $PATH/home/pi/hub/*
 
 echo "==Edit config"
 /bin/sed -i "s/\"model\".*/\"model\": \"$MODEL\",/" $PATH/home/pi/hub/config.json
