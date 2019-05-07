@@ -18,7 +18,6 @@ function create_if_config() {
 			echo -e "# Interface $2\nauto $2\nallow-hotplug $2"
 			echo -e "iface $2 inet static\n\taddress $address\n\tnetmask $netmask\n\tgateway $gateway\n\tdns-nameservers 8.8.8.8"
 		fi
-
 }
 
 #
@@ -63,7 +62,7 @@ function systemd_ip_editor ()
 
 #
 # edit ip address
-# $4 ipaddress $5 subnetmas $6 gateway $7
+# $4 ipaddress $5 subnetmas $6 gateway $7 dns
 function ip_editor ()
 {
 	if [[ $? = 0 ]]; then
@@ -174,10 +173,12 @@ then
 		fi
 	fi
 else # mode get ip address
+	localuuid=$(LC_ALL=C nmcli -f UUID,DEVICE connection show | grep $DEFAULT_ADAPTER | awk '{print $1}')
 	address=$(ip -4 addr show dev $DEFAULT_ADAPTER | awk '/inet/ {print $2}' | cut -d'/' -f1)
 	netmask=$(ip -4 addr show dev $DEFAULT_ADAPTER | awk '/inet/ {print $2}' | cut -d'/' -f2)
 	gateway=$(route -n | grep 'UG[ \t]' | awk '{print $2}' | sed -n '1p')
+	dns=$(nmcli conn show $localuuid | grep "IP4.DNS\[1\]:" | awk '{print $2}')
 
-	echo $address $netmask $gateway
+	echo {\"address\": \"$address\", \"netmask\": \"$netmask\", \"gateway\": \"$gateway\", \"dns\": \"$dns\"}
 fi
 
