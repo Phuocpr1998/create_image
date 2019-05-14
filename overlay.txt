@@ -1,0 +1,19 @@
+* Tao phan vung overlay
+fdisk /dev/mmcblk0
+n 	-- tao phan vung moi
+p 	-- tao phan vung primary
+2 	-- tao phan vung thu 2
+4669440 -- sector bat dau
++2G	-- tao phan vung 2G
+w	-- luu lai cai dat
+* format
+sudo mkfs.ext4 -L "overlay" /dev/mmcblk0p2
+* Enable overlay virtual read-only root
+su dung armbian-config
+
+* setup overlay path
++ Change root 
+	sudo overlayroot-chroot
++ Sua file /etc/overlayroot.conf
+overlayroot=device:dev=/dev/mmcblk0p2,timeout=180
+* Sau do reboot
