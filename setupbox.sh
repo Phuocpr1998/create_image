@@ -97,7 +97,7 @@ else # mode get ip address
 	localuuid=$(LC_ALL=C nmcli -f UUID,DEVICE connection show | grep $DEFAULT_ADAPTER | awk '{print $1}')
 	address=$(ip -4 addr show dev $DEFAULT_ADAPTER | awk '/inet/ {print $2}' | cut -d'/' -f1)
 	netmask=$(ip -4 addr show dev $DEFAULT_ADAPTER | awk '/inet/ {print $2}' | cut -d'/' -f2)
-	gateway=$(sudo route -n | grep 'UG[ \t]' | awk '{print $2}' | sed -n '1p')
+	gateway=$(sudo route -n | grep $DEFAULT_ADAPTER | grep 'UG[ \t]' | awk '{print $2}')
 	dns=$(nmcli conn show $localuuid | grep "IP4.DNS\[1\]:" | awk '{print $2}')
 
 	echo {\"address\": \"$address\", \"netmask\": $netmask, \"gateway\": \"$gateway\", \"dns\": \"$dns\"}
