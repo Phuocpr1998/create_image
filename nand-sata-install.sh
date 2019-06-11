@@ -58,8 +58,7 @@ create_armbian()
         USAGE=$(df -BM | grep ^/dev | head -1 | awk '{print $3}' | tr -cd '[0-9]. \n')
         DEST=$(df -BM | grep ^/dev | grep "${TempDir}"/rootfs | awk '{print $4}' | tr -cd '[0-9]. \n')
         if [[ $USAGE -gt $DEST ]]; then
-                dialog --title "$title" --backtitle "$backtitle" --colors --infobox\
-                "\n\Z1Partition too small.\Zn Needed: $USAGE MB Avaliable: $DEST MB" 5 60
+                echo "Partition too small.\Zn Needed: $USAGE MB Avaliable: $DEST MB"
                 umount_device "$1"; umount_device "$2"
                 exit 3
         fi
@@ -87,45 +86,30 @@ create_armbian()
         lsof / | awk 'NR==1 || $4~/[0-9][uw]/' | grep -v "^COMMAND" >> $logfile
 
         # count files is needed for progress bar
-        dialog --title " $title " --backtitle "$backtitle" --infobox "\n  Counting files ... few seconds." 5 60
         TODO=$(rsync -ahvrltDn --delete --stats --exclude-from=$EX_LIST / "${TempDir}"/rootfs | grep "Number of files:"|awk '{print $4}' | tr -d '.,')
-        echo -e "\nCopying ${TODO} files to $2. \c" >> $logfile
+        echo "Copying ${TODO} files to $2. \c" >> $logfile
 
         # creating rootfs
         # Speed copy increased x10
          # Variables for interfacing with rsync progress
         nsi_conn_path="${TempDir}/nand-sata-install"
         nsi_conn_done="${nsi_conn_path}/done"
-        nsi_conn_progress="${nsi_conn_path}/progress"
         mkdir -p "${nsi_conn_path}"
-        echo 0 >"${nsi_conn_progress}"
         echo no >"${nsi_conn_done}"
 
          # Launch rsync in background
         { \
         rsync -avrltD --delete --exclude-from=$EX_LIST / "${TempDir}"/rootfs | \
-        nl | awk '{ printf "%.0f\n", 100*$1/"'"$TODO"'" }' \
-        > "${nsi_conn_progress}" ;
+        nl;
          # save exit code from rsync
         echo  ${PIPESTATUS[0]} >"${nsi_conn_done}"
-        } &
+        } &> /dev/null &
 
          # while variables
+        echo "Transferring rootfs to $2 ($USAGE MB). This will take approximately $(( $((USAGE/300)) * 1 )) minutes to finish. Please wait!"
         rsync_copy_finish=0
-        rsync_progress=0
-        prev_progress=0
         rsync_done=""
         while [ "${rsync_copy_finish}" -eq 0 ]; do
-                # Sometimes reads the progress file while writing and only partial numbers (like 1 when is 15)
-                prev_progress=${rsync_progress}
-                rsync_progress=$(tail -n1 "${nsi_conn_progress}")
-                if [[ -z ${rsync_progress} ]]; then
-                        rsync_progress=${prev_progress}
-                fi
-                if [ ${prev_progress} -gt ${rsync_progress} ]; then
-                        rsync_progress=${prev_progress}
-                fi
-                echo "${rsync_progress}"
                 # finish the while if the rsync is finished
                 rsync_done=$(cat ${nsi_conn_done})
                 if [[ "${rsync_done}" != "no" ]]; then
@@ -141,12 +125,10 @@ create_armbian()
                         sleep 0.5
                 fi
 
-        done | \
-        dialog --backtitle "$backtitle" --title " $title " --gauge "\n\n  Transferring rootfs to $2 ($USAGE MB). \n\n \
-         This will take approximately $(( $((USAGE/300)) * 1 )) minutes to finish. Please wait!\n\n" 11 80
+        done
 
         # run rsync again to silently catch outstanding changes between / and "${TempDir}"/rootfs/
-        dialog --title "$title" --backtitle "$backtitle" --infobox "\n  Cleaning up ... Almost done." 5 40
+        echo "Cleaning up ... Almost done."
         rsync -avrltD --delete --exclude-from=$EX_LIST / "${TempDir}"/rootfs >/dev/null 2>&1
 
         # creating fstab from scratch

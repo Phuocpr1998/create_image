@@ -1,0 +1,20 @@
+* Tao phan vung
+fdisk /dev/mmcblk0
+d   -- delete phan vung cu (cac phan vung khac phan vung root)
+n 	-- tao phan vung moi
+p 	-- tao phan vung primary
+2 	-- tao phan vung thu 2
+4669440 -- sector bat dau
++10G	-- tao phan vung 10G
+w	-- luu lai cai dat
+* format
+sudo mkfs.ext4 -L "record" /dev/mmcblk0p2
+* create folder mount 
+sudo mkdir /mnt/record
+* Mount 
+sudo mount /dev/mmcblk0p2 /mnt/record
+** Chinh sua file fstab
+/dev/mmcblk0p2 /mnt/record ext4 defaults,nosuid,nodev,nofail 0 0 
+** Chinh hub service
+mkdir /mnt/record
+mount /dev/mmcblk0p2 /mnt/record
