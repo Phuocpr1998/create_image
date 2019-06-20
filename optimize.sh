@@ -54,9 +54,9 @@ sed -i 's|APT::Periodic::Update-Package-Lists "1";|APT::Periodic::Update-Package
 sed -i 's/vm.swappiness=.*$/vm.swappiness=5/g' /etc/sysctl.conf
 
 if [ -z $(grep -w "vm.min_free_kbytes" /etc/sysctl.conf ) ]; then
-    echo "vm.min_free_kbytes=32768" >> /etc/sysctl.conf
+    echo "vm.min_free_kbytes=65536" >> /etc/sysctl.conf
 else
-	sed -i 's/vm.min_free_kbytes=.*$/vm.min_free_kbytes=32768/g' /etc/sysctl.conf
+	sed -i 's/vm.min_free_kbytes=.*$/vm.min_free_kbytes=65536/g' /etc/sysctl.conf
 fi
 
 if [ -z $(grep -w "kernel.panic_on_rcu_stall" /etc/sysctl.conf ) ]; then
