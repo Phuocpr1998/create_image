@@ -1,7 +1,6 @@
 # parse options
 while [ -n "$1" ]; do
 	case "$1" in
-		--model) export MODEL="$2"; shift;;
 		--hostname) export HOSTNAME="$2"; shift;;
 		-*)
 			echo "Invalid option: $1"
@@ -12,11 +11,6 @@ while [ -n "$1" ]; do
 	shift;
 done
 
-if [ -z "$MODEL" ]
-then
-	echo "Missing model"
-	exit 1
-fi
 
 if [ -z "$HOSTNAME" ]
 then
@@ -58,7 +52,26 @@ sed -i 's|APT::Periodic::Update-Package-Lists "1";|APT::Periodic::Update-Package
 ### sysctl
 
 sed -i 's/vm.swappiness=.*$/vm.swappiness=5/g' /etc/sysctl.conf
-sed -i 's/vm.min_free_kbytes=.*$/vm.min_free_kbytes=32768/g' /etc/sysctl.conf
+
+if [ -z $(grep -w "vm.min_free_kbytes" /etc/sysctl.conf ) ]; then
+    echo "vm.min_free_kbytes=32768" >> /etc/sysctl.conf
+else
+	sed -i 's/vm.min_free_kbytes=.*$/vm.min_free_kbytes=32768/g' /etc/sysctl.conf
+fi
+
+if [ -z $(grep -w "kernel.panic_on_rcu_stall" /etc/sysctl.conf ) ]; then
+    echo "kernel.panic_on_rcu_stall=1" >> /etc/sysctl.conf
+else
+	sed -i 's/kernel.panic_on_rcu_stall=.*$/kernel.panic_on_rcu_stall=1/g' /etc/sysctl.conf
+fi
+
+if [ -z $(grep -w "kernel.panic_on_oops" /etc/sysctl.conf ) ]; then
+    echo "kernel.panic_on_oops=1" >> /etc/sysctl.conf
+else
+	sed -i 's/kernel.panic_on_oops=.*$/kernel.panic_on_oops=1/g' /etc/sysctl.conf
+fi
+
+#sed -i 's/vm.min_free_kbytes=.*$/vm.min_free_kbytes=32768/g' /etc/sysctl.conf
 
 echo "blacklist xradio_wlan" > /etc/modprobe.d/xradio_wlan.conf
 
@@ -105,11 +118,3 @@ systemctl mask rsync.service
 systemctl stop unattended-upgrades.service
 systemctl mask unattended-upgrades.service
 apt remove -y unattended-upgrades
-
-
-cd /tmp
-wget http://mirrors.kernel.org/ubuntu/pool/main/c/cloud-initramfs-tools/overlayroot_0.40ubuntu1_all.deb
-apt install busybox-static -y
-dpkg -i overlayroot_0.40ubuntu1_all.deb
-apt-get install -f -y
-sed -i "s/overlayroot=\"\"*/overlayroot=\"tmpfs\"/" /etc/overlayroot.conf
