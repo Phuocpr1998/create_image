@@ -30,9 +30,9 @@ echo "127.0.1.1    $HOSTNAME" > /etc/hosts
 sed -i 's/vm.swappiness=.*$/vm.swappiness=5/g' /etc/sysctl.conf
 
 if [ -z $(grep -w "vm.min_free_kbytes" /etc/sysctl.conf ) ]; then
-    echo "vm.min_free_kbytes=65536" >> /etc/sysctl.conf
+    echo "vm.min_free_kbytes=262144" >> /etc/sysctl.conf
 else
-	sed -i 's/vm.min_free_kbytes=.*$/vm.min_free_kbytes=65536/g' /etc/sysctl.conf
+	sed -i 's/vm.min_free_kbytes=.*$/vm.min_free_kbytes=262144/g' /etc/sysctl.conf
 fi
 
 if [ -z $(grep -w "kernel.panic_on_rcu_stall" /etc/sysctl.conf ) ]; then
